@@ -43,9 +43,9 @@ Codex must not independently:
 - alter the top or bottom HUD;
 - change navigation geometry, focus behavior, fonts, icons, backgrounds, translucency, spacing, color treatment, or page hierarchy merely to suit the NAND architecture;
 - substitute retail NXE/Metro visuals;
-- introduce a new visual language for NAND-only settings.
+- introduce a new visual language for NAND-only settings or Recovery.
 
-New NAND/system functions must be integrated into the existing CCLOS shell and design system.
+New NAND/system/recovery functions must be integrated into the existing CCLOS shell and design system.
 
 ## Architecture summary
 
@@ -84,7 +84,7 @@ ConsoleCrate Live OS
 - XboxSystemBridge;
 - default UI resources required to reach and operate the shell;
 - essential fonts/icons/localization/default configuration;
-- recovery components;
+- flash-resident CCLOS Recovery components;
 - immutable platform integration required for normal console operation.
 
 ### User storage owns
@@ -99,19 +99,67 @@ Writable or high-churn data must use available Xbox user storage such as HDD, on
 - custom themes/backgrounds;
 - notification/history data;
 - logs and temporary files;
-- optional third-party plugins such as stealth-service plugins.
+- optional third-party plugins such as stealth-service plugins;
+- Last Known Good / recovery backups when appropriate and verified.
 
-## Recovery
+## Recovery-first product design
 
-The target recovery contract is:
+Recovery is part of the product architecture, not a late troubleshooting feature.
+
+Target hierarchy:
 
 ```text
-POWER -> CCLOS
-EJECT -> XeLL
-CCLOS startup failure -> CCLOS Recovery
+Normal boot
+  POWER -> CCLOS
+
+Friendly recovery
+  Supported Recovery trigger -> CCLOS Recovery
+
+Emergency recovery
+  EJECT -> XeLL -> console-specific verified/remapped updflash.bin from USB
+
+Last resort
+  Boot/recovery chain unusable -> external NAND programmer
 ```
 
+The goal is that ordinary supported CCLOS software/firmware failures can normally be recovered **without opening the console**.
+
+CCLOS Recovery must:
+
+- start and show basic diagnostics with no HDD/MU/USB/network present;
+- provide Safe Mode before recommending a NAND reflash;
+- use the existing CCLOS visual language;
+- auto-detect a versioned recovery package from USB;
+- reject wrong-console, wrong-NAND, wrong-board, wrong-hash or otherwise unverified packages before any write;
+- create/read-verify a preflash backup when the board/destination supports it;
+- maintain a verified Last Known Good path where possible;
+- preserve Eject -> XeLL as the independent low-level escape hatch;
+- never expose a generic novice `select .bin and flash` workflow;
+- never claim that NAND flashing is unbrickable or power-loss-proof.
+
+See [`docs/RECOVERY_ARCHITECTURE.md`](docs/RECOVERY_ARCHITECTURE.md) and [`schemas/recovery-package.schema.json`](schemas/recovery-package.schema.json).
+
+## Worry-free / novice experience
+
+CCLOS NAND Edition should feel like a finished console product rather than a collection of Xbox 360 modding utilities.
+
+The default user should not need to understand CPU keys, KeyVaults, bad blocks, remapping, xeBuild, J-Runner or DashLaunch internals for ordinary supported installation, updates or recovery.
+
+The PC builder and console UI should prefer:
+
+```text
+Detect -> Validate -> Explain -> Backup -> Perform -> Verify -> Recover
+```
+
+rather than asking the owner to manually select low-level hardware parameters.
+
+See [`docs/NOVICE_EXPERIENCE.md`](docs/NOVICE_EXPERIENCE.md).
+
+## Console-specific NANDs only
+
 No generic ready-to-flash NAND image may be distributed. Every NAND image must be built from the target console's own NAND and preserve console-specific identity/configuration data.
+
+The PC builder eventually produces the console's verified installation/recovery outputs locally.
 
 ## Development order
 
@@ -121,11 +169,13 @@ No generic ready-to-flash NAND image may be distributed. Every NAND image must b
 4. Introduce the flash-system build target and XboxSystemBridge.
 5. Add retail-system feature parity through Xbox services or CCLOS-native equivalents.
 6. Integrate the DashLaunch-compatible plugin/runtime environment and preserve stealth-server compatibility.
-7. Build and verify console-specific NAND images offline.
-8. Hardware testing only after deterministic build/verification and recovery paths are proven.
+7. Implement/prove flash-resident CCLOS Recovery, Safe Mode, USB recovery verification and XeLL rescue.
+8. Build and verify console-specific NAND images offline.
+9. Hardware-test deterministic boot/recovery on development consoles.
+10. Only after recovery is proven: consider the integrated CCLOS Recovery flasher.
 
 ## Safety
 
-Early milestones are **build/read/verify only**. Automated NAND flashing is deliberately excluded until the image builder, recovery process, console-specific preservation rules, and hardware test matrix have been separately accepted.
+Early milestones are **build/read/verify only**. Automated NAND flashing is deliberately excluded until the image builder, recovery process, console-specific preservation rules, backup/read-verification, XeLL rescue path, and hardware test matrix have been separately accepted.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/NAND_SAFETY.md`](docs/NAND_SAFETY.md), and [`docs/MILESTONE_00_BASELINE.md`](docs/MILESTONE_00_BASELINE.md).
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/NAND_SAFETY.md`](docs/NAND_SAFETY.md), [`docs/RECOVERY_ARCHITECTURE.md`](docs/RECOVERY_ARCHITECTURE.md), [`docs/NOVICE_EXPERIENCE.md`](docs/NOVICE_EXPERIENCE.md), [`docs/ROADMAP.md`](docs/ROADMAP.md), and [`docs/MILESTONE_00_BASELINE.md`](docs/MILESTONE_00_BASELINE.md).
