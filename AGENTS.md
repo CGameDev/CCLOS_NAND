@@ -195,3 +195,30 @@ Mandatory rules:
 - Integrated flashing remains unauthorized until the recovery architecture, backup workflow, validation gates and physical-hardware tests are accepted.
 
 The release is not considered novice-ready until a supported user can recover an ordinary CCLOS software/firmware failure without needing to understand CPU keys, KeyVaults, bad blocks, xeBuild or J-Runner.
+
+## 14. PrivateConsoleData local workspace
+
+`PrivateConsoleData/` is the designated **local-only** workspace for real console-specific development data. Read `PrivateConsoleData/README.md` before using it.
+
+When a NAND/parser/builder/recovery/hardware milestone needs real console data, Codex must check this directory **before asking the owner to provide files again**.
+
+Expected behavior:
+
+1. Scan `PrivateConsoleData/` locally for candidate NAND dumps, CPU-key files, launch/plugin configuration, XeLL output and related owner-provided diagnostics.
+2. Identify candidate files by content/type where practical; do not require exact filenames when safe detection is possible.
+3. Validate relationships between the NAND, CPU key, hardware identity/configuration and any known-good RGH image before relying on them.
+4. Continue the milestone automatically when required inputs are present and valid.
+5. Ask the owner only when a genuinely required input is missing, corrupt, ambiguous, inconsistent or unsafe to infer.
+6. Treat owner-provided originals as read-only. Never modify them in place.
+7. Write derived analysis/build/recovery artifacts only to ignored working paths such as `local-output/` or `recovery-private/`.
+
+Security requirements:
+
+- Never commit `PrivateConsoleData/` contents other than its tracked README contract.
+- Never copy a real NAND, CPU key, decrypted KeyVault, DVD key, Console ID or other console secret into a tracked source/docs/test-fixture path.
+- Never print a full CPU key, decrypted KeyVault, DVD key or comparable secret into normal logs, GitHub issues, PRs, screenshots, support bundles or public manifests.
+- Use redacted identifiers or non-secret fingerprints/hashes for correlation where needed.
+- Never upload private console files to external/third-party services as part of development or diagnostics.
+- Keep public test fixtures synthetic/sanitized.
+
+The original NAND plus a matching CPU key should be treated as the primary console-specific source of truth. Do not require separately supplied KV/SMC files when they can be safely extracted and validated from the source NAND.
