@@ -2,13 +2,22 @@
 
 ## Canonical user-facing baseline
 
-**CCLOS Public Beta v0.35.2** is the only approved visual/behavior baseline for this project.
+The owner-approved baseline for CCLOS NAND Edition is the **latest validated local CCLOS source workspace** at:
 
-Artifact:
+`C:\cctu`
+
+The currently observed application version is:
+
+- semantic version: `0.35.4`
+- build label: `0.35.4 Internet Updates`
+
+The earlier **CCLOS Public Beta v0.35.2** release remains a useful historical/public comparison point, but it is no longer a hard implementation blocker and is not the required NAND Edition source baseline.
+
+Historical public artifact:
 
 `http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip`
 
-Donor source repository:
+Remote donor repository:
 
 `https://github.com/CGameDev/ConsoleCrateLive.git`
 
@@ -16,32 +25,37 @@ Expected source family:
 
 `CCLOS`
 
-## Known provenance gap
+## Owner-approved local-source rule
 
-At project initialization, `ConsoleCrateNativeStore/ConsoleCrateVersion.h` on the visible `CCLOS` branch reports `0.34.0`, not `0.35.2`.
+The owner has explicitly authorized CCLOS NAND Edition to use the latest local CCLOS source rather than requiring exact provenance back to v0.35.2.
 
-This is a **hard blocker for implementation, not permission to approximate**.
+Before implementation, Codex must freeze the exact local donor state from `C:\cctu` so later NAND work is reproducible.
 
-Codex must locate the source revision that produced the public v0.35.2 package. Once identified, record:
+The freeze must record, when available:
 
-- repository;
-- branch/tag if any;
-- full commit SHA;
+- local donor path;
+- current branch/worktree identity;
+- full Git HEAD SHA;
+- whether the donor working tree is clean or dirty;
 - application version;
 - build label;
-- public artifact filename;
-- SHA-256 of the public artifact if locally available;
-- SHA-256 of the imported baseline source manifest.
+- complete imported source/resource manifest;
+- SHA-256 of that manifest;
+- non-secret evidence describing any local/uncommitted changes included in the frozen baseline.
 
-in `baseline/baseline.lock.json`.
+A dirty working tree is allowed because the owner may have release fixes that were not yet committed. In that case, the **complete source manifest is the immutable baseline identity**, together with the donor HEAD SHA and dirty-state report.
+
+Do not reset, clean, checkout, rebase, modify, or otherwise mutate `C:\cctu` merely to obtain a cleaner baseline.
 
 ## Required baseline directory model
 
-After provenance is resolved, import the exact public-release source into:
+Import the frozen owner-approved source into:
 
 `src/CCLOS/`
 
-Do not rewrite it during import.
+The donor workspace `C:\cctu` is **read-only for CCLOS NAND development**.
+
+The import must preserve build-relevant source/resources while excluding Git metadata and clearly transient/non-source material such as temporary working directories, intermediate build outputs, cached files, and release archives unless a reviewed baseline manifest explicitly proves they are required to build CCLOS.
 
 NAND-specific code should be introduced around the baseline in clearly named components such as:
 
@@ -100,7 +114,7 @@ Any unavoidable visible status/error text must use the existing CCLOS renderer, 
 
 ## Prohibited substitutions
 
-Do not use screenshots of the public beta as UI backgrounds or fake the interface. Import and build the actual release-equivalent UI/resources.
+Do not use screenshots of CCLOS as UI backgrounds or fake the interface. Import and build the actual owner-approved source/resources.
 
 Do not substitute:
 
@@ -115,13 +129,16 @@ Do not substitute:
 
 Milestone 0 closes only when all of the following are true:
 
-1. exact v0.35.2 source provenance is known;
-2. immutable commit SHA is recorded;
-3. baseline source is imported into this repository;
-4. baseline builds with the expected Xbox 360 VS2010/XDK toolchain;
-5. a source/resource manifest is generated;
-6. the public-release navigation/pages can be matched to the imported source/assets;
-7. no NAND-specific behavior has yet changed the product;
-8. the owner is given a concise baseline report and no ambiguity remains.
+1. `C:\cctu` has been audited read-only;
+2. donor HEAD/branch/worktree state is recorded;
+3. the owner-approved local version/build label is recorded;
+4. the exact approved local source state is imported into `src/CCLOS/`;
+5. a complete source/resource manifest is generated and hashed;
+6. the imported baseline builds with the expected Xbox 360 VS2010/XDK toolchain;
+7. established navigation/pages/assets match the imported source;
+8. no NAND-specific behavior has yet changed the product;
+9. the owner is given a concise baseline freeze report.
 
-Until then, no NAND implementation should proceed.
+A historical v0.35.2 commit is **not** required to close Milestone 0.
+
+Until the local baseline freeze is complete, NAND implementation should not proceed.
