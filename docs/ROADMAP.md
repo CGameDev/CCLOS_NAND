@@ -2,6 +2,8 @@
 
 This roadmap is sequential by default. Every milestone inherits the baseline/UI lock in `/AGENTS.md` and `/BASELINE_LOCK.md`.
 
+Recovery is designed before integrated flashing. See `RECOVERY_ARCHITECTURE.md`.
+
 ## M0 — Exact CCLOS Public Beta v0.35.2 Baseline
 
 **Result:** exact release-producing source is identified, imported unchanged, built, inventoried and frozen.
@@ -25,9 +27,10 @@ Tasks:
 - establish Trinity 16 MB flash budget using proven xeBuild layout data;
 - identify Microsoft platform components that must remain in the target image;
 - identify retail dashboard shell components that are not required;
+- reserve/prove sufficient recovery budget before finalizing the flash payload;
 - produce a proposed flash payload without changing source/UI.
 
-**Hard rule:** no baseline feature may be deleted merely to hit a size target without owner approval.
+**Hard rule:** no baseline feature may be deleted merely to hit a size target without owner approval. Recovery must not be squeezed out to make the shell fit.
 
 ---
 
@@ -61,7 +64,8 @@ Requirements:
 - boot-critical code/resources separated from writable content;
 - optional caches/content remain storage-backed;
 - release optimization/resource packing is measured and deterministic;
-- no user settings/logs/history written repeatedly to system flash.
+- no user settings/logs/history written repeatedly to system flash;
+- recovery core/resources are treated as required system content, not optional extras.
 
 Outputs may include separate shell/runtime/recovery modules if size and platform behavior justify them.
 
@@ -183,31 +187,95 @@ Requirements:
 - no stealth provider is bundled into CCLOS;
 - stealth-server compatibility is tested as coexistence only;
 - LiveBlock/LiveStrong and user protection settings are never silently disabled;
-- Original Xbox/title-transition compatibility is tested separately.
+- Original Xbox/title-transition compatibility is tested separately;
+- define a no-write Safe Mode that can bypass optional external plugins without deleting their configuration.
 
 ---
 
-## M10 — Flash-Resident CCLOS Recovery
+## M10 — Flash-Resident CCLOS Recovery & Novice-Safe Rescue
 
-**Result:** CCLOS has an independent recovery environment that does not depend on HDD/MU/USB to present basic diagnostics.
+**Result:** CCLOS has an independent recovery environment and validated rescue design suitable for nontechnical users before integrated flashing is permitted.
+
+Governing specification: `docs/RECOVERY_ARCHITECTURE.md`.
 
 Target behavior:
 
 ```text
 POWER -> CCLOS
+SUPPORTED RECOVERY TRIGGER -> CCLOS Recovery
 EJECT -> XeLL
-CCLOS failure -> CCLOS Recovery
+CCLOS startup failure -> CCLOS Recovery where boot path remains viable
 ```
 
-Recovery capabilities may include:
+### M10A — Recovery core and diagnostics
 
-- show flash/system health;
-- disable external plugin overrides for next boot;
-- reset CCLOS volatile/user configuration on attached storage;
-- verify flash-resident CCLOS files;
-- restore a supported last-known-good CCLOS system payload when architecture permits;
-- boot USB recovery payload as an optional source;
-- guide the user to external reflash when recovery cannot safely repair.
+- recovery starts with HDD/MU/USB/network absent;
+- locked CCLOS visual language is reused;
+- show console/board/NAND/CCLOS/system health in plain language;
+- Continue to CCLOS;
+- CCLOS Safe Mode;
+- System Diagnostics;
+- disable optional external plugins for next boot without deleting configuration;
+- Boot XeLL;
+- Power/Restart actions;
+- no NAND writes yet.
+
+### M10B — Recovery package format and verifier
+
+Define a versioned `CCLOS_RECOVERY` package containing a manifest, image/payload and SHA-256 metadata.
+
+The verifier must reject before write:
+
+- corrupt hash;
+- wrong NAND byte length;
+- unsupported image format;
+- wrong motherboard family;
+- wrong NAND geometry/type;
+- package from another console;
+- identity/KeyVault/SMC preservation mismatch;
+- unsupported exploit/build combination;
+- invalid bad-block/remap state;
+- missing/incompatible recovery prerequisites.
+
+There is no generic `browse for .bin -> flash` novice flow.
+
+### M10C — Last Known Good and backup design
+
+- define verified preflash backup bundle;
+- define Last Known Good lifecycle;
+- ensure backups are hash/read-verified;
+- bind recovery artifacts to the correct console without putting secrets into shareable manifests;
+- define preferred USB/HDD/MU recovery destinations;
+- never claim a backup exists if write/read verification failed.
+
+### M10D — XeLL rescue path
+
+Prove the builder can produce a console-specific, correctly remapped XeLL rescue `updflash.bin` for the supported Trinity target.
+
+Document the novice emergency flow as:
+
+```text
+Copy supplied updflash.bin to supported USB root
+-> insert USB
+-> power on with Eject
+-> XeLL detects/flashes image
+-> reboot
+```
+
+Do not assume later 4 GB/eMMC hardware follows identical behavior; validate each hardware family separately.
+
+### M10 acceptance gate
+
+M10 is not complete until physical development hardware proves:
+
+- recovery starts with HDD removed;
+- Safe Mode can recover from optional plugin/config startup problems without NAND writes;
+- wrong-console/wrong-NAND/wrong-hash packages are rejected before NAND modification;
+- Eject -> XeLL remains operational;
+- a valid XeLL USB rescue image works on the initial target;
+- a nontechnical tester can follow ordinary recovery instructions without J-Runner/NAND terminology.
+
+No integrated CCLOS NAND writer is authorized by M10 itself.
 
 ---
 
@@ -242,6 +310,8 @@ No automatic hardware flash.
 Required outputs:
 
 - candidate `CCLOS_updflash.bin`;
+- console-specific XeLL rescue `updflash.bin` workflow/output as defined by M10;
+- CCLOS Recovery package/manifest inputs where applicable;
 - build manifest;
 - preserved-data verification report;
 - size/layout report;
@@ -267,8 +337,10 @@ Hardware acceptance includes:
 - attach/remove HDD/MU/USB dynamically;
 - Xbox profile discovery on storage;
 - reboot/power cycle;
+- supported trigger -> CCLOS Recovery;
 - Eject -> XeLL;
-- plugin-disabled safe boot;
+- Safe Mode with optional plugins suppressed;
+- valid/invalid USB recovery-package detection without unsafe writes;
 - selected plugin/stealth coexistence test;
 - game launch and return paths;
 - no retail dashboard dependency;
@@ -287,26 +359,65 @@ Candidate expansion:
 - other supported RGH3 configurations;
 - supported RGH1.2/RGH2/JTAG configurations where builder logic is proven.
 
-Each board/storage family receives its own layout, recovery and hardware matrix.
+Each board/storage family receives its own layout, recovery, XeLL/rawflash capability and hardware matrix. A recovery method proven on Trinity is not automatically declared safe for 4 GB/eMMC hardware.
 
 ---
 
-## M15 — Optional Integrated Flasher
+## M15 — Integrated CCLOS Recovery Flasher
 
 **Not authorized by earlier milestones.**
 
-Only after offline build/verification and manual hardware flashing are proven repeatedly.
+Only after offline build/verification, manual hardware flashing, CCLOS Recovery, preflash backup and XeLL rescue are proven repeatedly on the supported hardware family.
 
-Must separately design:
+Must implement and separately validate:
 
-- pre-write checks;
-- power-loss behavior;
-- source/target verification;
-- write progress;
-- read-back verification;
-- failure recovery;
-- user warnings;
-- recovery bundle creation;
-- supported hardware boundaries.
+- auto-detect candidate recovery package;
+- no unrestricted raw `.bin` browser in novice mode;
+- package SHA-256 validation;
+- console/board/NAND/identity compatibility validation;
+- pre-write current-NAND dump where board support is proven;
+- read/hash verification of the backup;
+- clear final confirmation using plain language;
+- stable-power warning;
+- proven board-specific rawflash writer;
+- write progress that does not imply completion early;
+- post-write/read-back verification where supported;
+- hard-reset/reboot path only after completion state is known;
+- failed-write/recovery instructions;
+- Last Known Good lifecycle;
+- preservation of Eject -> XeLL;
+- logs that contain no console secrets;
+- refusal on unknown/unsupported hardware.
 
-Until M15 is explicitly approved, CCLOS NAND Builder generates and verifies images but does not write console flash automatically.
+Target sequence:
+
+```text
+Detect recovery package
+-> validate package
+-> validate console
+-> validate current NAND
+-> create/read-verify backup
+-> final confirmation
+-> write using proven board-specific routine
+-> verify written data where supported
+-> reboot
+-> post-boot health check
+-> mark new build Last Known Good only after health gate passes
+```
+
+The UI must never describe NAND flashing as unbrickable or power-loss-proof.
+
+Until M15 is explicitly approved and completed, CCLOS NAND Builder generates and verifies images but does not write console flash automatically.
+
+---
+
+## Release-quality recovery target
+
+A CCLOS NAND Edition build is not considered novice-ready until an ordinary supported software/firmware failure can normally be recovered without opening the console, and the documented escalation path is:
+
+```text
+Safe Mode / Repair
+-> Verified CCLOS USB Recovery
+-> XeLL USB Rescue
+-> External programmer only when the boot/recovery chain itself cannot run
+```
