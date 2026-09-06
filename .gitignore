@@ -1,0 +1,48 @@
+# Visual Studio / Xbox build outputs
+.vs/
+Debug/
+Release/
+Release_LTCG/
+Profile/
+Profile_FastCap/
+ipch/
+*.sdf
+*.suo
+*.user
+*.opensdf
+*.pdb
+*.obj
+*.ilk
+*.log
+*.tlog
+*.lastbuildstate
+
+# Local baseline resolver/import scratch
+baseline/_resolver/
+
+# Sensitive console-specific material — NEVER COMMIT
+*.bin
+*.ecc
+*.nand
+*.keyvault
+*.kv
+*.updflash
+CPUKey.txt
+cpukey.txt
+flashdmp.bin
+updflash.bin
+recovery.bin
+OriginalNAND.bin
+LastKnownGood.bin
+
+# Local builder inputs/outputs
+local-input/
+local-output/
+recovery-private/
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+Thumbs.db
+.DS_Store
