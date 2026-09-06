@@ -1,12 +1,23 @@
-# M0 — Resolve, Import, Build and Freeze CCLOS Public Beta v0.35.2
+# M0 — Snapshot, Import, Build and Freeze Owner-Approved Local CCLOS Baseline
 
-**Status:** BLOCKED ON EXACT v0.35.2 SOURCE PROVENANCE
+**Status:** READY FOR LOCAL BASELINE FREEZE
 
 ## Goal
 
-Establish an immutable, buildable copy of the **exact source that produced CCLOS Public Beta v0.35.2** inside this repository before any NAND-specific product change is made.
+Establish an immutable, buildable copy of the **owner-approved latest local CCLOS source** from:
 
-This milestone exists specifically to prevent Codex from starting a new UI, approximating a missing release, or modifying an older CCLOS revision and calling it NAND Edition.
+`C:\cctu`
+
+inside this repository before any NAND-specific product change is made.
+
+The currently observed source reports:
+
+- version: `0.35.4`
+- build label: `0.35.4 Internet Updates`
+
+The earlier Public Beta v0.35.2 remains a historical comparison point only. The owner has explicitly approved using the latest local source, so exact v0.35.2 source provenance is no longer a blocker.
+
+This milestone exists to prevent Codex from modifying the live donor workspace, inventing missing source, redesigning the UI, or starting NAND work before the exact donor state is frozen.
 
 ## Governing rules
 
@@ -17,92 +28,126 @@ Read and obey, in order:
 3. `/baseline/baseline.lock.json`
 4. `/docs/ARCHITECTURE.md`
 5. `/docs/NAND_SAFETY.md`
+6. `/docs/LOCAL_SAMPLE_LIBRARY.md`
 
-## Known starting evidence
+## Known local development environment
 
-Public baseline:
+```text
+CCLOS donor source:
+C:\cctu
 
-`CCLOS_Public_Beta_v0.35.2.zip`
+J-Runner with Extras reference install:
+C:\Users\CGAmeDev\Downloads\J-Runner-with-Extras
 
-Public artifact URL:
+Private console data:
+C:\CCLOS-NAND-Development\PrivateConsoleData\
 
-`http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip`
+Multi-console NAND sample library:
+C:\CCLOS-NAND-Development\PrivateConsoleData\Samples\
 
-Donor repository:
+Derived working output:
+C:\CCLOS-NAND-Development\Working\
+C:\CCLOS-NAND-Development\Builds\
+C:\CCLOS-NAND-Development\Recovery\
+C:\CCLOS-NAND-Development\Logs\
+```
 
-`https://github.com/CGameDev/ConsoleCrateLive.git`
-
-Expected source family:
-
-`CCLOS`
-
-Observed donor branch state when this NAND repository was initialized:
-
-- ref: `CCLOS`
-- commit: `b799070d40b46e2f9895ef8e0d988fda866b963c`
-- version reported by `ConsoleCrateNativeStore/ConsoleCrateVersion.h`: `0.34.0`
-
-Therefore this observed branch head is **not approved as the v0.35.2 baseline** without independent provenance.
+The donor source, J-Runner installation, original NANDs, CPU keys and known-good RGH images are read-only reference inputs unless a later owner-approved milestone explicitly says otherwise.
 
 ## Tasks
 
-### M0-T001 — Provenance resolution
+### M0-T001 — Read-only donor audit
+
+Run the local baseline resolver against `C:\cctu`:
+
+```powershell
+.\tools\Resolve-CCLOSBaseline.ps1 -SourcePath 'C:\cctu'
+```
+
+Record at minimum:
+
+- resolved source path;
+- Git top-level path;
+- Git directory/worktree arrangement;
+- current branch when available;
+- full HEAD commit SHA;
+- clean/dirty working-tree state;
+- `CONSOLECRATE_VERSION`;
+- `CONSOLECRATE_VERSION_LABEL`;
+- a sanitized list of changed/untracked paths if the donor is dirty.
+
+Do not run `git reset`, `git clean`, checkout another branch, rebase, stash, or otherwise mutate the donor merely to make it clean.
+
+A dirty working tree is acceptable because the owner may have fixes newer than the last committed source.
+
+### M0-T002 — Freeze identity
+
+The frozen baseline identity must be reproducible.
+
+If the donor is clean:
+
+- record the full HEAD SHA;
+- record version/build label;
+- import the exact source;
+- generate a full source/resource SHA-256 manifest.
+
+If the donor is dirty:
+
+- record the full HEAD SHA;
+- record that the working tree is dirty;
+- record sanitized changed/untracked paths;
+- import the exact approved local working-tree source state;
+- generate a full source/resource SHA-256 manifest.
+
+For a dirty donor, the **manifest hash is authoritative for the frozen local state**. Do not silently discard or reconstruct local changes.
+
+### M0-T003 — Exact local source import
 
 Run:
 
 ```powershell
-.\tools\Resolve-CCLOSBaseline.ps1
-```
-
-Search donor branches/tags/history or owner-provided source for the exact v0.35.2-producing revision.
-
-Do not edit version constants to make an older revision say `0.35.2`.
-
-Do not merge later UI by inspection.
-
-Do not reconstruct the public beta from the binary package.
-
-**Output:** exact 40-character commit SHA plus evidence linking it to the public artifact.
-
-### M0-T002 — Public artifact hash
-
-Using the actual distributed ZIP, calculate SHA-256 and record it in `baseline/baseline.lock.json`.
-
-Do not upload the public binary package to this repository merely to satisfy this task unless the owner explicitly requests it and redistribution is appropriate.
-
-### M0-T003 — Exact source import
-
-Once the commit is proven, run:
-
-```powershell
-.\tools\Import-CCLOSBaseline.ps1 -CommitSha <40-character-sha>
+.\tools\Import-CCLOSBaseline.ps1 -SourcePath 'C:\cctu'
 ```
 
 The import goes to:
 
 `src/CCLOS/`
 
-The import script copies source without modifying it and generates:
+The script must not modify `C:\cctu`.
+
+The importer may exclude only clearly transient/non-source material such as:
+
+- Git metadata;
+- `.tmp` scratch content;
+- intermediate Debug/Release/LTCG build output;
+- IDE caches;
+- packaged release ZIPs;
+- deployment backups;
+- private secrets;
+
+unless a reviewed dependency check proves a specific excluded item is build-required.
+
+Generate:
 
 `src/CCLOS-baseline-manifest.sha256`
 
-Record the manifest SHA-256 in `baseline/baseline.lock.json`.
+and record its SHA-256 in `baseline/baseline.lock.json`.
 
 ### M0-T004 — Baseline build
 
-Build the imported baseline using its established Xbox 360 toolchain. Do not introduce NAND changes just to make the build pass.
+Build the imported baseline using its established Xbox 360 toolchain. Do not introduce NAND changes merely to make the build pass.
 
-Expected family:
+Expected environment is already owner-confirmed:
 
-- Visual Studio 2010 solution/tooling
-- Xbox 360 XDK 21256.x class toolchain
-- existing Release/Debug Xbox 360 configurations
+- Visual Studio 2010;
+- Xbox 360 XDK 21256.x-class toolchain;
+- established Xbox 360 Debug/Release configurations.
 
-Document exact build host assumptions and errors if the imported source requires unavailable local-only files.
+Document the exact build result and any local-only dependency that is genuinely required.
 
 ### M0-T005 — UI/behavior inventory
 
-Create a deterministic inventory of the public baseline's established visible product. At minimum identify:
+Create a deterministic inventory of the owner-approved baseline's established visible product. At minimum identify:
 
 - all top-level destinations;
 - navigation order;
@@ -120,8 +165,8 @@ Create a deterministic inventory of the public baseline's established visible pr
 - About;
 - Security;
 - Watch TV/media;
-- Social Hub if present in v0.35.2;
-- Quick Guide/Control Center if present in v0.35.2;
+- Social Hub if present;
+- Quick Guide/Control Center if present;
 - primary dialogs/status/progress surfaces;
 - fonts, renderer resources, backgrounds and UI chrome assets.
 
@@ -131,50 +176,56 @@ This is an inventory, **not** permission to redesign.
 
 Create `docs/BASELINE_FREEZE_REPORT.md` containing:
 
-- exact source commit;
-- public artifact SHA-256;
+- source path `C:\cctu`;
+- donor HEAD SHA;
+- branch/worktree state;
+- clean/dirty state;
+- frozen version/build label;
 - source manifest SHA-256;
 - build result;
 - UI inventory summary;
-- any public-artifact/source discrepancy;
+- sanitized description of included local changes when applicable;
 - explicit statement that no NAND-specific product behavior was introduced.
 
-Update `baseline/baseline.lock.json` to `resolved: true` only after all required evidence exists.
+Update `baseline/baseline.lock.json` to `resolved: true` only after the frozen import, manifest and build evidence exist.
 
 ## Prohibited work during M0
 
 Do not:
 
+- modify `C:\cctu`;
+- modify the J-Runner installation;
 - create a new dashboard shell;
 - redesign any page;
 - change the HUD;
 - change fonts/colors/icons/translucency/navigation;
-- introduce NAND paths;
-- introduce a new settings UI;
+- introduce NAND paths into the baseline merely to finish M0;
 - implement XboxSystemBridge;
 - rewrite storage code;
-- add xeBuild/J-Runner integration;
 - add a flasher;
-- generate a test NAND;
-- copy retail Xbox dashboard UI/assets.
+- generate or flash a test NAND;
+- copy retail Xbox dashboard UI/assets;
+- commit real NANDs, CPU keys, KeyVault data or other console secrets.
 
-M0 is provenance + import + build + inventory only.
+M0 is local-baseline freeze + import + build + inventory only.
 
 ## Acceptance criteria
 
 M0 closes only when:
 
-- [ ] exact v0.35.2 source revision is proven;
-- [ ] immutable commit SHA is recorded;
-- [ ] public artifact SHA-256 is recorded;
-- [ ] exact baseline source is present under `src/CCLOS/`;
-- [ ] source manifest is generated and hashed;
+- [ ] `C:\cctu` is audited read-only;
+- [ ] donor HEAD/branch/worktree state is recorded;
+- [ ] owner-approved version/build label is recorded;
+- [ ] exact local source state is present under `src/CCLOS/`;
+- [ ] source/resource manifest is generated and hashed;
 - [ ] baseline Debug/Release build status is documented;
-- [ ] public v0.35.2 UI/behavior inventory is documented;
+- [ ] UI/behavior inventory is documented;
 - [ ] no NAND implementation or UI redesign has occurred;
 - [ ] `baseline/baseline.lock.json` is resolved;
 - [ ] owner has a concise handoff report.
 
 ## Stop condition
 
-If the exact v0.35.2 source cannot be found, **stop here** and report the missing provenance. The correct action is to obtain or publish that source revision—not to let Codex approximate it.
+Stop only if the local donor cannot be read safely, the version cannot be identified, the import cannot be reproduced, required build inputs are genuinely missing, or the imported source cannot be tied to the frozen manifest.
+
+Do **not** stop merely because the source is newer than v0.35.2 or because the donor working tree contains owner-approved local fixes.
