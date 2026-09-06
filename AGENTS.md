@@ -4,27 +4,28 @@ These rules govern all Codex work in this repository.
 
 ## 1. Absolute baseline rule
 
-The product baseline is **CCLOS Public Beta v0.35.2**.
+The owner-approved product baseline is the **latest validated local CCLOS source workspace** at:
 
-Public artifact:
+`C:\cctu`
 
-`http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip`
+The currently observed source reports:
 
-Source donor repository:
+- `CONSOLECRATE_VERSION "0.35.4"`
+- `CONSOLECRATE_VERSION_LABEL "0.35.4 Internet Updates"`
 
-`https://github.com/CGameDev/ConsoleCrateLive.git`
+The earlier CCLOS Public Beta v0.35.2 release is a historical/public comparison point only. The owner has explicitly authorized using the latest local source, so exact v0.35.2 source provenance is **not** a blocker.
 
-Expected source family: `CCLOS`.
+Before implementation, Codex must freeze the exact approved local donor state into `src/CCLOS/`, record donor Git/worktree state, generate a complete source/resource manifest, hash that manifest, build the imported baseline, and update `baseline/baseline.lock.json`.
 
-The source currently visible on branch `CCLOS` reports version `0.34.0`. Do **not** treat that source as v0.35.2 without evidence. Locate the exact source revision that produced the v0.35.2 public beta and record the immutable commit SHA in `baseline/baseline.lock.json` before implementation.
+`C:\cctu` is read-only for this project. Do not reset, clean, checkout, stash, rebase, rewrite, or otherwise mutate that donor workspace merely to obtain a clean baseline.
 
-If the exact v0.35.2 source revision is unavailable, stop after documenting the mismatch. Do not recreate missing source, UI, assets, behavior, or feature changes by guessing.
+If the donor working tree contains owner-approved uncommitted fixes, preserve those exact changes in the frozen import. In that case the complete source manifest, together with the donor HEAD SHA and dirty-state report, defines the immutable baseline.
 
 ## 2. UI is locked
 
 CCLOS NAND Edition is a platform/firmware adaptation of CCLOS, not a new dashboard design.
 
-Unless an owner-approved milestone explicitly authorizes a visible change, preserve the v0.35.2 public release exactly for:
+Unless an owner-approved milestone explicitly authorizes a visible change, preserve the frozen owner-approved baseline exactly for:
 
 - Home and all existing main destinations;
 - top HUD and bottom HUD;
@@ -128,13 +129,14 @@ Stealth-server compatibility means **coexistence**, not implementing stealth or 
 
 Before changing product source:
 
-1. resolve exact v0.35.2 baseline source;
-2. record commit SHA and artifact identity;
-3. import baseline without behavior changes;
-4. build the imported baseline with the established Xbox 360 toolchain;
-5. compare menus/pages/assets against the public beta;
-6. produce a baseline manifest/hash report;
-7. only then start NAND-specific refactoring.
+1. audit `C:\cctu` read-only;
+2. record donor HEAD/branch/worktree state and current version/build label;
+3. import the exact owner-approved local source state without modifying the donor;
+4. generate and hash a complete source/resource manifest;
+5. build the imported baseline with the established Xbox 360 toolchain;
+6. inventory menus/pages/assets and confirm expected behavior;
+7. update `baseline/baseline.lock.json` and `docs/BASELINE_FREEZE_REPORT.md`;
+8. only then start NAND-specific refactoring.
 
 Every milestone must state what baseline behavior is preserved and must have a rollback point.
 
@@ -247,3 +249,31 @@ Security requirements:
 - The presence of the sample library authorizes read/analyze/compare/offline-build validation only. It does not authorize NAND flashing.
 
 The original NAND plus a matching CPU key should be treated as the primary console-specific source of truth. Do not require separately supplied KV/SMC files when they can be safely extracted and validated from the source NAND.
+
+## 15. Local development tool/reference paths
+
+Known owner-confirmed local environment:
+
+```text
+CCLOS donor source (READ ONLY):
+C:\cctu
+
+J-Runner with Extras reference installation (READ ONLY):
+C:\Users\CGAmeDev\Downloads\J-Runner-with-Extras
+
+Private NAND workspace:
+C:\CCLOS-NAND-Development\PrivateConsoleData\
+
+Sample library:
+C:\CCLOS-NAND-Development\PrivateConsoleData\Samples\
+
+Derived outputs:
+C:\CCLOS-NAND-Development\Working\
+C:\CCLOS-NAND-Development\Builds\
+C:\CCLOS-NAND-Development\Recovery\
+C:\CCLOS-NAND-Development\Logs\
+```
+
+The owner has confirmed the Visual Studio 2010/Xbox 360 XDK build environment is working, the designated first hardware test console is an RGH3 Trinity 16 MB, the console is reachable through Xbox 360 Neighborhood, and a NAND backup exists.
+
+J-Runner is initially a comparison/reference implementation. Do not modify its installed files and do not invoke NAND write operations from it during early milestones.
