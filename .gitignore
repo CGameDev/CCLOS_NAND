@@ -21,6 +21,9 @@ ipch/
 baseline/_resolver/
 
 # Sensitive console-specific material — NEVER COMMIT
+# Keep the tracked PrivateConsoleData/README.md usage contract, but ignore all real local data.
+PrivateConsoleData/*
+!PrivateConsoleData/README.md
 *.bin
 *.ecc
 *.nand
@@ -33,6 +36,7 @@ flashdmp.bin
 updflash.bin
 recovery.bin
 OriginalNAND.bin
+CurrentRGH3NAND.bin
 LastKnownGood.bin
 
 # Local builder inputs/outputs
