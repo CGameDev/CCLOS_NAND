@@ -1,32 +1,46 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "product": "ConsoleCrate Live OS NAND Edition",
   "baseline": {
-    "requiredPublicVersion": "0.35.2",
-    "publicArtifact": "CCLOS_Public_Beta_v0.35.2.zip",
-    "publicArtifactUrl": "http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip",
-    "sourceRepository": "https://github.com/CGameDev/ConsoleCrateLive.git",
+    "policy": "owner-approved-latest-local-source",
+    "localSourcePath": "C:\\cctu",
+    "approvedObservedVersion": "0.35.4",
+    "approvedObservedBuildLabel": "0.35.4 Internet Updates",
+    "remoteSourceRepository": "https://github.com/CGameDev/ConsoleCrateLive.git",
     "expectedSourceFamily": "CCLOS",
+    "historicalPublicReferenceVersion": "0.35.2",
+    "historicalPublicArtifact": "CCLOS_Public_Beta_v0.35.2.zip",
+    "historicalPublicArtifactUrl": "http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip",
     "resolved": false,
     "resolvedCommitSha": null,
+    "resolvedBranch": null,
     "resolvedSourceVersion": null,
-    "publicArtifactSha256": null,
-    "sourceManifestSha256": null
+    "resolvedBuildLabel": null,
+    "donorWorkingTreeDirty": null,
+    "sourceManifestSha256": null,
+    "baselineFreezeReport": "docs/BASELINE_FREEZE_REPORT.md"
   },
-  "observedDonorStateAtProjectInitialization": {
-    "ref": "CCLOS",
-    "commitSha": "b799070d40b46e2f9895ef8e0d988fda866b963c",
-    "reportedVersion": "0.34.0",
-    "versionFile": "ConsoleCrateNativeStore/ConsoleCrateVersion.h",
-    "versionFileBlobSha": "f3b9853af26369df0ad0ba7b01fdfa7642d7a01b",
-    "equivalentToRequiredBaseline": false,
-    "note": "Do not import this revision as the v0.35.2 baseline unless independent provenance proves it produced the public v0.35.2 release."
+  "ownerDecision": {
+    "latestLocalSourceAuthorized": true,
+    "exactV0352ProvenanceRequired": false,
+    "note": "Owner explicitly authorized using the latest validated local CCLOS source at C:\\cctu. v0.35.2 remains historical reference only."
+  },
+  "localDevelopmentEnvironment": {
+    "jRunnerWithExtrasPath": "C:\\Users\\CGAmeDev\\Downloads\\J-Runner-with-Extras",
+    "privateConsoleDataPath": "C:\\CCLOS-NAND-Development\\PrivateConsoleData",
+    "sampleLibraryPath": "C:\\CCLOS-NAND-Development\\PrivateConsoleData\\Samples",
+    "workingPath": "C:\\CCLOS-NAND-Development\\Working",
+    "buildsPath": "C:\\CCLOS-NAND-Development\\Builds",
+    "recoveryPath": "C:\\CCLOS-NAND-Development\\Recovery",
+    "logsPath": "C:\\CCLOS-NAND-Development\\Logs"
   },
   "hardGates": {
     "allowNandImplementationBeforeBaselineResolved": false,
     "allowUiReconstructionByApproximation": false,
     "allowIndependentUiRedesign": false,
     "allowRetailDashboardVisualSubstitution": false,
-    "requireOwnerApprovedUiChangeMilestone": true
+    "requireOwnerApprovedUiChangeMilestone": true,
+    "allowMutationOfLocalDonorWorkspace": false,
+    "allowNandFlashingInEarlyMilestones": false
   }
 }
