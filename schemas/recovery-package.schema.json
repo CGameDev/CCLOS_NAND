@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://consolecrate.xyz/schemas/cclos-nand/recovery-package-v1.schema.json",
+  "title": "CCLOS NAND Edition Recovery Package Manifest",
+  "description": "Versioned non-secret metadata used to validate a console-specific CCLOS recovery package before any NAND write. This schema intentionally does not contain CPU keys, decrypted KeyVaults, DVD keys, or other console secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "package_id",
+    "created_utc",
+    "cclos",
+    "target",
+    "source",
+    "image",
+    "recovery"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "package_id": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "created_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "cclos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["firmware_version", "build_id", "builder_version"],
+      "properties": {
+        "firmware_version": { "type": "string", "minLength": 1 },
+        "build_id": { "type": "string", "minLength": 1 },
+        "builder_version": { "type": "string", "minLength": 1 },
+        "baseline_version": { "type": "string" },
+        "baseline_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{40}$"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "console_fingerprint",
+        "motherboard_family",
+        "nand_kind",
+        "nand_capacity_bytes",
+        "kernel_family",
+        "exploit_family"
+      ],
+      "properties": {
+        "console_fingerprint": {
+          "type": "string",
+          "description": "Non-secret builder-generated fingerprint sufficient to bind the package to the intended console without exposing CPU key or decrypted identity material.",
+          "minLength": 16,
+          "maxLength": 256
+        },
+        "motherboard_family": {
+          "type": "string",
+          "enum": ["Trinity", "Corona", "Jasper", "Falcon", "Opus", "Zephyr", "Xenon", "Unknown"]
+        },
+        "nand_kind": {
+          "type": "string",
+          "enum": ["RAW", "MMC_4GB", "OTHER"]
+        },
+        "nand_capacity_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kernel_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exploit_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "board_revision": { "type": "string" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_nand_sha256", "source_build_fingerprint"],
+      "properties": {
+        "source_nand_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "source_build_fingerprint": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 256
+        },
+        "original_backup_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "byte_length", "sha256", "image_role", "already_remapped"],
+      "properties": {
+        "filename": {
+          "type": "string",
+          "pattern": "^[^\\\\/:*?\"<>|]+$"
+        },
+        "byte_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "image_role": {
+          "type": "string",
+          "enum": ["CCLOS_RECOVERY", "CCLOS_UPDATE", "XELL_RESCUE", "ROLLBACK"]
+        },
+        "already_remapped": {
+          "type": "boolean"
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires_xell", "expected_xell_available", "last_known_good_eligible"],
+      "properties": {
+        "requires_xell": { "type": "boolean" },
+        "expected_xell_available": { "type": "boolean" },
+        "last_known_good_eligible": { "type": "boolean" },
+        "minimum_recovery_version": { "type": "string" },
+        "rollback_authorized": { "type": "boolean", "default": false }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 32
+    }
+  }
+}
