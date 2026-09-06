@@ -196,29 +196,54 @@ Mandatory rules:
 
 The release is not considered novice-ready until a supported user can recover an ordinary CCLOS software/firmware failure without needing to understand CPU keys, KeyVaults, bad blocks, xeBuild or J-Runner.
 
-## 14. PrivateConsoleData local workspace
+## 14. Private console data and external sample library
 
-`PrivateConsoleData/` is the designated **local-only** workspace for real console-specific development data. Read `PrivateConsoleData/README.md` before using it.
+The tracked `PrivateConsoleData/` directory is documentation only. Real console-specific development data is stored **outside the Git repository** at:
 
-When a NAND/parser/builder/recovery/hardware milestone needs real console data, Codex must check this directory **before asking the owner to provide files again**.
+```text
+C:\CCLOS-NAND-Development\PrivateConsoleData\
+```
+
+The consolidated multi-console NAND sample library is at:
+
+```text
+C:\CCLOS-NAND-Development\PrivateConsoleData\Samples\
+```
+
+Read `PrivateConsoleData/README.md` and `docs/LOCAL_SAMPLE_LIBRARY.md` before using real NAND data.
+
+When a NAND/parser/builder/recovery/hardware milestone needs real console data, Codex must check these external locations **before asking the owner to provide files again**.
 
 Expected behavior:
 
-1. Scan `PrivateConsoleData/` locally for candidate NAND dumps, CPU-key files, launch/plugin configuration, XeLL output and related owner-provided diagnostics.
-2. Identify candidate files by content/type where practical; do not require exact filenames when safe detection is possible.
-3. Validate relationships between the NAND, CPU key, hardware identity/configuration and any known-good RGH image before relying on them.
-4. Continue the milestone automatically when required inputs are present and valid.
-5. Ask the owner only when a genuinely required input is missing, corrupt, ambiguous, inconsistent or unsafe to infer.
-6. Treat owner-provided originals as read-only. Never modify them in place.
-7. Write derived analysis/build/recovery artifacts only to ignored working paths such as `local-output/` or `recovery-private/`.
+1. Check the primary external references under `C:\CCLOS-NAND-Development\PrivateConsoleData\`.
+2. For multi-sample analysis, inspect `C:\CCLOS-NAND-Development\PrivateConsoleData\Samples\` and read `_Manifest\CCLOS_NAND_Samples.json` when present.
+3. Inventory the actual sample folders rather than assuming a fixed count; the library can grow over time.
+4. Identify candidate NAND dumps, CPU-key files, build logs, launch/plugin configuration, XeLL output and related owner-provided diagnostics by content/type where practical.
+5. Validate relationships between each NAND, CPU key, hardware identity/configuration and any known-good RGH image before relying on them.
+6. Use multiple samples to distinguish motherboard/NAND-layout constants from console-specific bytes.
+7. Include bad-block/remap samples and differing xeBuild option combinations in parser/builder validation when available.
+8. Treat anything under `Needs_Review\` as untrusted until positively classified.
+9. Continue the milestone automatically when required inputs are present and valid.
+10. Ask the owner only when a genuinely required input is missing, corrupt, ambiguous, inconsistent or unsafe to infer.
+11. Treat all owner-provided originals as read-only. Never modify them in place.
+12. Write derived analysis/build/recovery artifacts only under the external working paths:
+
+```text
+C:\CCLOS-NAND-Development\Working\
+C:\CCLOS-NAND-Development\Builds\
+C:\CCLOS-NAND-Development\Recovery\
+C:\CCLOS-NAND-Development\Logs\
+```
 
 Security requirements:
 
-- Never commit `PrivateConsoleData/` contents other than its tracked README contract.
+- Never commit real NAND/sample data. Only the tracked documentation contract belongs in the repository.
 - Never copy a real NAND, CPU key, decrypted KeyVault, DVD key, Console ID or other console secret into a tracked source/docs/test-fixture path.
 - Never print a full CPU key, decrypted KeyVault, DVD key or comparable secret into normal logs, GitHub issues, PRs, screenshots, support bundles or public manifests.
-- Use redacted identifiers or non-secret fingerprints/hashes for correlation where needed.
+- Use redacted identifiers, hashes or non-secret fingerprints for correlation where needed.
 - Never upload private console files to external/third-party services as part of development or diagnostics.
 - Keep public test fixtures synthetic/sanitized.
+- The presence of the sample library authorizes read/analyze/compare/offline-build validation only. It does not authorize NAND flashing.
 
 The original NAND plus a matching CPU key should be treated as the primary console-specific source of truth. Do not require separately supplied KV/SMC files when they can be safely extracted and validated from the source NAND.
