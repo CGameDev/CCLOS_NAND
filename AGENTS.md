@@ -36,9 +36,9 @@ Unless an owner-approved milestone explicitly authorizes a visible change, prese
 - Quick Guide/Control Center presentation already present in the baseline;
 - existing feature entry points, dialog patterns and status screens.
 
-Never create an alternative NAND-themed UI. Never redesign CCLOS to resemble NXE, Metro, Aurora, Freestyle Dash, Fusion, Windows, or any unrelated reference unless the owner explicitly requests it in a later milestone.
+Never create an alternative NAND-themed UI. Never redesign CCLOS to resemble NXE, Metro, Aurora, Freestyle Dash, Fusion, Windows, Android recovery, or any unrelated reference unless the owner explicitly requests it in a later milestone.
 
-New system/NAND functions must be inserted using the existing CCLOS visual language and existing reusable renderer/components.
+New system/NAND/recovery functions must be inserted using the existing CCLOS visual language and existing reusable renderer/components.
 
 ## 3. Product definition
 
@@ -81,8 +81,9 @@ The complete retail NXE/Metro dashboard is not required as a fallback and must n
 Target recovery:
 
 - Power -> CCLOS
+- supported Recovery trigger -> CCLOS Recovery
 - Eject -> XeLL
-- CCLOS startup failure -> CCLOS Recovery
+- CCLOS startup failure -> CCLOS Recovery where the boot path remains viable
 
 The project may retain only Microsoft system components actually required by the Xbox platform and CCLOS feature set.
 
@@ -148,20 +149,49 @@ Required progression:
 - package/resource validation;
 - flash-layout and image parser validation;
 - deterministic NAND build comparison;
+- recovery-package validation;
 - image verification;
 - sacrificial/development console test with external programmer recovery available;
+- prove CCLOS Recovery and Eject -> XeLL recovery on supported hardware;
 - only much later: integrated flashing.
 
 No milestone may claim hardware success without owner-reported physical-console acceptance.
 
 ## 11. Do not guess
 
-When information is unknown—NAND structure, ordinal, XAM behavior, source provenance, flash path, board-specific storage, boot-stage behavior, file format or system setting—do not invent an answer in code.
+When information is unknown—NAND structure, ordinal, XAM behavior, source provenance, flash path, board-specific storage, boot-stage behavior, file format, recovery entry trigger, flash writer behavior or system setting—do not invent an answer in code.
 
-Use proven Xbox 360/XDK/xeBuild/J-Runner/DashLaunch references where licensing permits. Mark unsupported cases explicitly and fail safely.
+Use proven Xbox 360/XDK/xeBuild/J-Runner/DashLaunch/XeLL/rawflash references where licensing permits. Mark unsupported cases explicitly and fail safely.
 
 ## 12. Ownership
 
 Project/product: **ConsoleCrate Live OS / CCLOS NAND Edition**
 
 Development/branding ownership: **Computer Universal Technology Systems** / Brian Hinds, consistent with the existing CCLOS source headers and project conventions.
+
+## 13. Novice-safe recovery is a product requirement
+
+Read `docs/RECOVERY_ARCHITECTURE.md` before implementing any NAND writer, updater or recovery path.
+
+The intended owner experience is similar in convenience to a consumer-device recovery environment: ordinary supported software/firmware failures should be recoverable from CCLOS Recovery or XeLL using a verified console-specific USB recovery package without opening the Xbox 360.
+
+This does **not** mean the console is unbrickable. If neither CCLOS Recovery nor XeLL can execute, an external NAND programmer may still be required.
+
+Mandatory rules:
+
+- CCLOS Recovery must be flash-resident enough to start and show basic diagnostics with no HDD/MU/USB/network present.
+- Eject -> XeLL must remain an independent emergency path on supported builds.
+- Do not expose a generic `browse for .bin -> flash` workflow to normal users.
+- A recovery write action remains disabled until package hash, image geometry, motherboard family, console-specific identity/preservation, SMC/config, exploit/build compatibility, bad-block/remap state and recovery prerequisites are positively validated as applicable.
+- Unknown validation state means **do not write**.
+- Wrong-console/wrong-NAND/wrong-hash packages must be rejected before any NAND modification.
+- Create and verify a preflash backup whenever the integrated recovery writer has a proven writable destination and board-specific dump support.
+- Preserve a verified Last Known Good recovery option on user storage when possible.
+- Provide a no-write Safe Mode before suggesting a full reflash.
+- Missing or corrupt optional plugins/settings must not force a NAND reflash.
+- Never claim power-loss-proof or unbrickable flashing.
+- Normal CCLOS updates must not casually replace the recovery/XeLL layer; recovery-layer updates require explicit compatibility validation.
+- The PC builder must eventually generate both the normal CCLOS image and a console-specific XeLL-compatible rescue `updflash.bin` workflow where supported.
+- Integrated flashing remains unauthorized until the recovery architecture, backup workflow, validation gates and physical-hardware tests are accepted.
+
+The release is not considered novice-ready until a supported user can recover an ordinary CCLOS software/firmware failure without needing to understand CPU keys, KeyVaults, bad blocks, xeBuild or J-Runner.
