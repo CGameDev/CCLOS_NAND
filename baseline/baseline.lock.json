@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "product": "ConsoleCrate Live OS NAND Edition",
+  "baseline": {
+    "requiredPublicVersion": "0.35.2",
+    "publicArtifact": "CCLOS_Public_Beta_v0.35.2.zip",
+    "publicArtifactUrl": "http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip",
+    "sourceRepository": "https://github.com/CGameDev/ConsoleCrateLive.git",
+    "expectedSourceFamily": "CCLOS",
+    "resolved": false,
+    "resolvedCommitSha": null,
+    "resolvedSourceVersion": null,
+    "publicArtifactSha256": null,
+    "sourceManifestSha256": null
+  },
+  "observedDonorStateAtProjectInitialization": {
+    "ref": "CCLOS",
+    "commitSha": "b799070d40b46e2f9895ef8e0d988fda866b963c",
+    "reportedVersion": "0.34.0",
+    "versionFile": "ConsoleCrateNativeStore/ConsoleCrateVersion.h",
+    "versionFileBlobSha": "f3b9853af26369df0ad0ba7b01fdfa7642d7a01b",
+    "equivalentToRequiredBaseline": false,
+    "note": "Do not import this revision as the v0.35.2 baseline unless independent provenance proves it produced the public v0.35.2 release."
+  },
+  "hardGates": {
+    "allowNandImplementationBeforeBaselineResolved": false,
+    "allowUiReconstructionByApproximation": false,
+    "allowIndependentUiRedesign": false,
+    "allowRetailDashboardVisualSubstitution": false,
+    "requireOwnerApprovedUiChangeMilestone": true
+  }
+}
