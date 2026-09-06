@@ -14,27 +14,32 @@ The Microsoft retail dashboard shell is not the target shell. CCLOS provides the
 
 ## Baseline lock
 
-The visual, navigation, terminology, feature, and behavior baseline is the existing **CCLOS Public Beta v0.35.2** release.
+The owner-approved visual, navigation, terminology, feature, and behavior baseline is the **latest validated local CCLOS source** at:
 
-Public release artifact:
+`C:\cctu`
+
+The currently observed source reports:
+
+- version: `0.35.4`
+- build label: `0.35.4 Internet Updates`
+
+The earlier **CCLOS Public Beta v0.35.2** release remains a historical/public comparison point only. Exact v0.35.2 provenance is no longer a hard blocker because the owner explicitly approved using the latest local source.
+
+Historical public artifact:
 
 `http://consolecrate.xyz/updates/CCLOS_Public_Beta_v0.35.2.zip`
 
-Source donor repository:
+Remote donor repository:
 
 `https://github.com/CGameDev/ConsoleCrateLive.git`
 
-Expected source family:
+**Important:** Codex must treat `C:\cctu` as a read-only donor workspace. Milestone 0 freezes the exact current local source state, including owner-approved uncommitted fixes if present, into `src/CCLOS/` and generates a deterministic source/resource manifest before NAND-specific implementation begins.
 
-`CCLOS`
-
-**Important:** the currently visible `CCLOS` source branch reports version `0.34.0`, while the public beta is `0.35.2`. Codex must not assume those are equivalent. The first implementation gate is to locate or obtain the source revision that actually produced the v0.35.2 public release, record its commit SHA, and import that exact baseline. If the exact source revision cannot be established, implementation stops at the baseline audit. Codex must never recreate missing v0.35.2 UI or behavior from memory or by approximation.
-
-See [`BASELINE_LOCK.md`](BASELINE_LOCK.md) and [`AGENTS.md`](AGENTS.md).
+See [`BASELINE_LOCK.md`](BASELINE_LOCK.md), [`AGENTS.md`](AGENTS.md), and [`docs/MILESTONE_00_BASELINE.md`](docs/MILESTONE_00_BASELINE.md).
 
 ## UI preservation rule
 
-CCLOS NAND Edition must retain the existing CCLOS public-release interface exactly unless an owner-approved milestone explicitly authorizes a UI change.
+CCLOS NAND Edition must retain the owner-approved CCLOS baseline interface exactly unless an owner-approved milestone explicitly authorizes a UI change.
 
 Codex must not independently:
 
@@ -102,6 +107,32 @@ Writable or high-churn data must use available Xbox user storage such as HDD, on
 - optional third-party plugins such as stealth-service plugins;
 - Last Known Good / recovery backups when appropriate and verified.
 
+## Local development environment
+
+Known owner-approved local paths:
+
+```text
+CCLOS donor source:
+C:\cctu
+
+J-Runner with Extras reference:
+C:\Users\CGAmeDev\Downloads\J-Runner-with-Extras
+
+Private console data:
+C:\CCLOS-NAND-Development\PrivateConsoleData\
+
+NAND sample library:
+C:\CCLOS-NAND-Development\PrivateConsoleData\Samples\
+
+Working/build/recovery/log output:
+C:\CCLOS-NAND-Development\Working\
+C:\CCLOS-NAND-Development\Builds\
+C:\CCLOS-NAND-Development\Recovery\
+C:\CCLOS-NAND-Development\Logs\
+```
+
+These donor/reference locations are read-only unless a later owner-approved milestone explicitly authorizes a change.
+
 ## Recovery-first product design
 
 Recovery is part of the product architecture, not a late troubleshooting feature.
@@ -163,7 +194,7 @@ The PC builder eventually produces the console's verified installation/recovery 
 
 ## Development order
 
-1. Establish and lock the exact CCLOS v0.35.2 source baseline.
+1. Snapshot, import, build and freeze the owner-approved latest local CCLOS source from `C:\cctu`.
 2. Perform a NAND-size and dependency audit without changing UI or behavior.
 3. Refactor platform/storage assumptions so CCLOS can operate without HDD storage.
 4. Introduce the flash-system build target and XboxSystemBridge.
@@ -171,11 +202,11 @@ The PC builder eventually produces the console's verified installation/recovery 
 6. Integrate the DashLaunch-compatible plugin/runtime environment and preserve stealth-server compatibility.
 7. Implement/prove flash-resident CCLOS Recovery, Safe Mode, USB recovery verification and XeLL rescue.
 8. Build and verify console-specific NAND images offline.
-9. Hardware-test deterministic boot/recovery on development consoles.
+9. Hardware-test deterministic boot/recovery first on the designated RGH3 Trinity 16 MB development console.
 10. Only after recovery is proven: consider the integrated CCLOS Recovery flasher.
 
 ## Safety
 
 Early milestones are **build/read/verify only**. Automated NAND flashing is deliberately excluded until the image builder, recovery process, console-specific preservation rules, backup/read-verification, XeLL rescue path, and hardware test matrix have been separately accepted.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/NAND_SAFETY.md`](docs/NAND_SAFETY.md), [`docs/RECOVERY_ARCHITECTURE.md`](docs/RECOVERY_ARCHITECTURE.md), [`docs/NOVICE_EXPERIENCE.md`](docs/NOVICE_EXPERIENCE.md), [`docs/ROADMAP.md`](docs/ROADMAP.md), and [`docs/MILESTONE_00_BASELINE.md`](docs/MILESTONE_00_BASELINE.md).
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/NAND_SAFETY.md`](docs/NAND_SAFETY.md), [`docs/RECOVERY_ARCHITECTURE.md`](docs/RECOVERY_ARCHITECTURE.md), [`docs/NOVICE_EXPERIENCE.md`](docs/NOVICE_EXPERIENCE.md), [`docs/ROADMAP.md`](docs/ROADMAP.md), [`docs/LOCAL_SAMPLE_LIBRARY.md`](docs/LOCAL_SAMPLE_LIBRARY.md), and [`docs/MILESTONE_00_BASELINE.md`](docs/MILESTONE_00_BASELINE.md).
