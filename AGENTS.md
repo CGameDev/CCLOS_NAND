@@ -21,25 +21,23 @@ Before implementation, Codex must freeze the exact approved local donor state in
 
 If the donor working tree contains owner-approved uncommitted fixes, preserve those exact changes in the frozen import. In that case the complete source manifest, together with the donor HEAD SHA and dirty-state report, defines the immutable baseline.
 
-## 2. UI is locked
+## 2. Owner-approved exact UI lock — updated 2026-09-06
 
-CCLOS NAND Edition is a platform/firmware adaptation of CCLOS, not a new dashboard design.
+The owner has explicitly authorized the supplied dark navy/cyan/teal CCLOS screen set as the **new CCLOS NAND front-end appearance** under milestone `CCLOS-NAND-EXACT-UI-1.0`.
 
-Unless an owner-approved milestone explicitly authorizes a visible change, preserve the frozen owner-approved baseline exactly for:
+Read `CCLOS_NAND_UI_MILESTONE.md` and `docs/ui/CCLOS_NAND_ExactUI/00_IMPLEMENTATION_CONTRACT.md` before any UI work. The owner-uploaded Home image is the authoritative shared-shell master; the other registered images are authoritative for their page bodies. They are not inspiration, examples or permission to make a look-alike.
 
-- Home and all existing main destinations;
-- top HUD and bottom HUD;
-- navigation rail and destination order;
-- page geometry and safe areas;
-- focus and controller behavior;
-- fonts, colors, translucency, backgrounds, borders, spacing, icons and artwork treatment;
-- wording/terminology;
-- Quick Guide/Control Center presentation already present in the baseline;
-- existing feature entry points, dialog patterns and status screens.
+This approved milestone supersedes older requirements to preserve the donor's **visual appearance** only for the specified NAND UI surfaces. The ordinary CCLOS product and `C:\cctu` remain unchanged. Functional baseline, feature preservation, source freezing, backend behavior, no-storage operation, recovery and NAND safety rules are not superseded. Older visual-preservation wording elsewhere must be read with this explicit exception.
 
-Never create an alternative NAND-themed UI. Never redesign CCLOS to resemble NXE, Metro, Aurora, Freestyle Dash, Fusion, Windows, Android recovery, or any unrelated reference unless the owner explicitly requests it in a later milestone.
+Implement in this order: global shell (background, logo, top navigation, profile area, footer HUD); shared tile/hero/right-info/list-row/category-tab/button/focus components; Home, My Games, Store, Downloads, Settings, Media; then Game Detail, Download Detail, Network Settings, Interface Customization, Live TV Guide, Movies/Media Browse and DLC/Title Updates. On-screen tab order remains Home / My Games / Media / Store / Downloads / Settings.
 
-New system/NAND/recovery functions must be inserted using the existing CCLOS visual language and existing reusable renderer/components.
+Use one shared shell. Preserve the master geometry, branding, proportions, spacing, borders, accents and typography hierarchy. Do not substitute NXE, Metro, Aurora, Freestyle Dash, Fusion, a generic Xbox UI, a desktop/web prototype, or a full-screen screenshot with invisible hotspots. Implement real interactive components and existing service bindings.
+
+Verify and open the original PNGs before coding. If originals are missing or hash-mismatched, stop visual implementation and import the exact approved asset package; never regenerate replacements or proceed from thumbnails. Source pixel crops are exact references; transparent masks, clean background, vector components and icon exports are reconstructed candidates requiring visual proof. Do not claim those candidates are recovered original layers or an exact original font.
+
+Resolve sample-data and generated-image inconsistencies through `12_REFERENCE_RECONCILIATION.md`. Do not invent Xbox Live connectivity, prices/purchases, cloud saves, title progress, social feeds, performance or platform capabilities from screenshot content. Bind real data in the same layout; unsupported actions require honest disabled states.
+
+New system/NAND/recovery functions must use the approved CCLOS visual language while retaining the established safety gates. Unspecified deeper screens must be inventoried and preserved, not silently removed or independently redesigned. Each checkpoint requires actual renderer captures, overlay/difference review, controller/route tests and a rollback point. No numeric visual-accuracy percentage or hardware result may be claimed without evidence.
 
 ## 3. Product definition
 
