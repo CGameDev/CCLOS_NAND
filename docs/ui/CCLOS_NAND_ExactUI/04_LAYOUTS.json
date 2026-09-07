@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "reference_canvas": {"width": 1672, "height": 941},
+  "authority": "Home PNG governs global shell; each page PNG governs its page body; source pixels override measured convenience rectangles",
+  "home_shell_rects": {
+    "logo": [55,34,330,126],
+    "top_nav": [425,35,1165,125],
+    "profile_status_slogan": [1230,35,1615,170],
+    "hero": [55,160,880,565],
+    "right_tile_grid": [890,175,1595,565],
+    "recently_used_region": [55,585,1115,785],
+    "home_download_widget": [1120,585,1600,780],
+    "footer_hud": [0,810,1672,941]
+  },
+  "nav_order": ["Home","My Games","Media","Store","Downloads","Settings"],
+  "implementation_order": ["global shell","shared components","Home","My Games","Store","Downloads","Settings","Media","submenus"],
+  "rules": [
+    "Do not use a full-screen reference PNG as a clickable screenshot background.",
+    "Static crops may be textures/reference evidence; dynamic fields must be live controls.",
+    "Use one shared shell geometry across all pages.",
+    "Never modify the references to make implementation output appear correct."
+  ]
+}

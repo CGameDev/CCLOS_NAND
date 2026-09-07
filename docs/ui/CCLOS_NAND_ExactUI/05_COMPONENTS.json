@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "source_pixels_win": true,
+  "candidate_colors": {
+    "focus_cyan": "#21E8EC",
+    "selected_green": "#13E6A5",
+    "outline_blue": "#31596D"
+  },
+  "components": [
+    {"id":"tile","required_states":["normal","focused","selected","pressed","disabled"]},
+    {"id":"hero","required_states":["normal","focused","selected"]},
+    {"id":"right_info","required_states":["normal","focused"]},
+    {"id":"list_row","required_states":["normal","focused","selected","disabled","error"]},
+    {"id":"category_tabs","required_states":["inactive","active","focused"]},
+    {"id":"buttons","required_states":["normal","focused","pressed","disabled"]},
+    {"id":"focus_language","rule":"Exactly one focus owner; reproduce the approved cyan/teal edge/glow language; do not invent a new focus treatment."}
+  ],
+  "font_rule":"Verify the existing project font and metrics locally. No font files are bundled or guessed by this milestone."
+}
