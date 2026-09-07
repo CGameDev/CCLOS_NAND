@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 68 68">
- <title>CCLOS shared frame disabled - reconstructed runtime candidate</title>
- <defs><linearGradient id="p" x2="0" y2="1"><stop stop-color="#071F2D"/><stop offset="1" stop-color="#04111B"/></linearGradient>
- <filter id="g" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter></defs>
- <rect x="18" y="18" width="32" height="32" rx="8" fill="none" stroke="#31596D" stroke-opacity="0.45" stroke-width="1" />
- <rect x="18" y="18" width="32" height="32" rx="8" fill="none" stroke="#31596D" stroke-width="1"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 68 68"><title>CCLOS shared frame disabled - reconstructed runtime candidate</title><rect x="18" y="18" width="32" height="32" rx="8" fill="none" stroke="#31596D" stroke-opacity="0.45" stroke-width="1"/></svg>
